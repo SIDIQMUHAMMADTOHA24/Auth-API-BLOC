@@ -25,3 +25,18 @@ class LoggedIn extends AuthEvent {
 }
 
 class LoggedOut extends AuthEvent {}
+
+class Register extends AuthEvent {
+  final String token;
+
+  const Register({required this.token});
+
+  @override
+  List<Object> get props => [token];
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return 'LoggedIn(token : $token)';
+  }
+}

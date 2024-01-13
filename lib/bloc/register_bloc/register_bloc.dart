@@ -5,32 +5,32 @@ import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 
-part 'login_event.dart';
-part 'login_state.dart';
+part 'register_event.dart';
+part 'register_state.dart';
 
-class LoginBloc extends Bloc<LoginEvent, LoginState> {
+class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   final UserRepository userRepository;
   final AuthBloc authBloc;
-  LoginBloc({required this.userRepository, required this.authBloc})
-      : super(LoginInitial()) {
-    on<LoginButtonPressed>((event, emit) async {
-      emit(LoginLoading());
+  RegisterBloc({required this.userRepository, required this.authBloc})
+      : super(RegisterInitial()) {
+    on<RegisterButtonPressed>((event, emit) async {
+      emit(RegisterLoading());
       try {
-        final token = await userRepository.login(event.email, event.password);
-        authBloc.add(LoggedIn(token: token));
-        emit(LoginSuccess(
+        final token =
+            await userRepository.register(event.email, event.password);
+        authBloc.add(Register(token: token));
+        emit(RegisterSuccess(
             userModel:
                 UserModel(email: event.email, password: event.password)));
       } catch (error) {
         //handle error
         if (error is DioException) {
           var errorMessage = error.response?.data['error'];
-          emit(LoginFailure(error: errorMessage));
+          emit(RegisterFailure(error: errorMessage));
         } else {
-          emit(LoginFailure(error: error.toString()));
+          emit(RegisterFailure(error: error.toString()));
         }
       }
     });
   }
 }
-

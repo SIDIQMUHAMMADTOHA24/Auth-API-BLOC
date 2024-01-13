@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:auth_bloc/repository/user_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -10,8 +12,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required this.userRepository}) : super(AuthInitial()) {
     on<AppStarted>((event, emit) async {
       final bool hasToken = await userRepository.hasToken();
+      final String email = await userRepository.getEmail();
       if (hasToken) {
-        emit(AuthAuthenticated());
+        emit(AuthAuthenticated(email: email));
       } else {
         emit(AuthUnauthenticated());
       }
@@ -20,7 +23,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoggedIn>((event, emit) async {
       emit(AuthLoading());
       await userRepository.persisToken(event.token);
-      emit(AuthAuthenticated());
+      final String email = await userRepository.getEmail();
+      emit(AuthAuthenticated(email: email));
+    });
+
+    on<Register>((event, emit) async {
+      emit(AuthLoading());
+      await userRepository.persisToken(event.token);
+      final String email = await userRepository.getEmail();
+      emit(AuthAuthenticated(email: email));
     });
 
     on<LoggedOut>((event, emit) async {
